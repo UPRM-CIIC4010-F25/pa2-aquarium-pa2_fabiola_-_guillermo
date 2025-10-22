@@ -205,7 +205,22 @@ std::shared_ptr<Creature> Aquarium::getCreatureAt(int index) {
     return m_creatures[index];
 }
 
+bool Aquarium::checkCollision(const std::shared_ptr<Creature>& a,
+                              const std::shared_ptr<Creature>& b){
+    if (!a || !b) return false;
 
+    const float dx = a->getX() - b->getX();
+    const float dy = a->getY() - b->getY();
+    const float r  = a->getCollisionRadius() + b->getCollisionRadius();
+    return (dx*dx + dy*dy) <= (r*r);
+}
+
+void Aquarium::handleCollision(const std::shared_ptr<Creature>& a,
+                               const std::shared_ptr<Creature>& b)
+{
+    if (a) a->bounce();
+    if (b) b->bounce();
+}
 
 void Aquarium::SpawnCreature(AquariumCreatureType type) {
     int x = rand() % this->getWidth();
@@ -265,7 +280,10 @@ std::shared_ptr<GameEvent> DetectAquariumCollisions(std::shared_ptr<Aquarium> aq
     
     for (int i = 0; i < aquarium->getCreatureCount(); ++i) {
         std::shared_ptr<Creature> npc = aquarium->getCreatureAt(i);
-        if (npc && checkCollision(player, npc)) {
+        if (!npc || npc.get() == player.get()) continue;
+        if (aquarium->checkCollision(player, npc)) {
+            
+            aquarium->handleCollision(player, npc);
             return std::make_shared<GameEvent>(GameEventType::COLLISION, player, npc);
         }
     }
