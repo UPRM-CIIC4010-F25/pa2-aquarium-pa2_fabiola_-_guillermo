@@ -124,7 +124,11 @@ public:
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
 
+     bool checkCollision(const std::shared_ptr<Creature>& a,
+                    const std::shared_ptr<Creature>& b);
 
+    void handleCollision(const std::shared_ptr<Creature>& a,
+                     const std::shared_ptr<Creature>& b);
 private:
     int m_maxPopulation = 0;
     int m_width;
