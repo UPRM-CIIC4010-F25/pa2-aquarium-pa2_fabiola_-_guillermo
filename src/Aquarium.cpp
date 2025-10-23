@@ -227,6 +227,22 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
     int y = rand() % this->getHeight();
     int speed = 1 + rand() % 25; // Speed between 1 and 25
 
+
+
+    // Pick a radius by type using simple ifs:
+    float radius = 30.0f; //defail - small fish
+    if (type == AquariumCreatureType::BiggerFish) {
+        radius = 60.0f;   //big fish
+    }
+
+    // Keep the spawn point inside the glass
+    if (x < (int)radius) x = (int)radius;
+    if (x > this->getWidth()  - (int)radius) x = this->getWidth()  - (int)radius;
+    if (y < (int)radius) y = (int)radius;
+    if (y > this->getHeight() - (int)radius) y = this->getHeight() - (int)radius;
+
+
+
     switch (type) {
         case AquariumCreatureType::NPCreature:
             this->addCreature(std::make_shared<NPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::NPCreature)));

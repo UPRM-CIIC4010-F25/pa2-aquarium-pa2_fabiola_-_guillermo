@@ -12,7 +12,34 @@ void Creature::normalize() {
 }
 
 void Creature::bounce() {
-    // should implement boundary controls here
+    /// Keep the edge of the fish inside the tank
+    float margin = m_collisionRadius;
+
+    float left   = margin;
+    float right  = m_width  - margin;
+    float top    = margin;
+    float bottom = m_height - margin;
+
+    // Hit left wall  stick to it and go right
+    if (m_x < left) {
+        m_x = left;
+        if (m_dx < 0) m_dx = -m_dx;
+    }
+    // Hit right wall  stick to it and go left
+    if (m_x > right) {
+        m_x = right;
+        if (m_dx > 0) m_dx = -m_dx;
+    }
+    // Hit top wall  stick to it and go down
+    if (m_y < top) {
+        m_y = top;
+        if (m_dy < 0) m_dy = -m_dy;
+    }
+    // Hit bottom wall  stick to it and go up
+    if (m_y > bottom) {
+        m_y = bottom;
+        if (m_dy > 0) m_dy = -m_dy;
+    }
 }
 
 

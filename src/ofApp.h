@@ -37,6 +37,7 @@ class ofApp : public ofBaseApp{
 
 
 		ofImage backgroundImage;
+		ofSoundPlayer backgroundMusic; //added for the background music
 
 		std::unique_ptr<GameSceneManager> gameManager;
 		std::shared_ptr<AquariumSpriteManager>spriteManager;

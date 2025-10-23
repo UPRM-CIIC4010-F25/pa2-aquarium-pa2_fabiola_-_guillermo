@@ -54,12 +54,26 @@ void ofApp::setup(){
     ));
 
     ofSetLogLevel(OF_LOG_NOTICE); // Set default log level
+
+    //background music setup
+    if(!backgroundMusic.load("backgroundMusic.mp3")){
+        ofLogError()<< "Failed to load background music!";
+    }else{
+        backgroundMusic.play();
+        backgroundMusic.setLoop(true);
+        backgroundMusic.setVolume(0.5f);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
     if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::GAME_OVER)){
+        //music stops at game over
+        if(backgroundMusic.isPlaying()){ 
+        backgroundMusic.stop();
+
+        }
         return; // Stop updating if game is over or exiting
     }
 
@@ -86,7 +100,7 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-    
+    backgroundMusic.stop(); //music will stop on exit
 }
 
 //--------------------------------------------------------------
