@@ -45,13 +45,43 @@ void PlayerCreature::update() {
 void PlayerCreature::draw() const {
     
     ofLogVerbose() << "PlayerCreature at (" << m_x << ", " << m_y << ") with speed " << m_speed << std::endl;
-    if (this->m_damage_debounce > 0) {
-        ofSetColor(ofColor::red); // Flash red if in damage debounce
+    ofPushStyle(); 
+    ofPushMatrix(); 
+
+    float scale = 1.0f;
+    if (m_powered) {
+        float pulse = sin(ofGetElapsedTimef() * 5.0f) * 0.2f; 
+        scale += pulse;
     }
+
+    
+    float cx = m_x;
+    float cy = m_y;
+    ofTranslate(cx, cy);
+    ofScale(scale, scale);
+    ofTranslate(-cx, -cy);
+
+    if (this->m_damage_debounce > 0) {
+        ofSetColor(ofColor::red); // Flash red if in damage debounce 
+    } 
+    
+    // Rainbow glow when powered
+    else if (m_powered) {
+        float t = ofGetElapsedTimef() * 2.0f; 
+        ofColor rainbow = ofColor::fromHsb(fmod(t * 50, 255), 200, 255); 
+        ofSetColor(rainbow);
+    } 
+    else {
+        ofSetColor(ofColor::white);// restore color
+    }
+
+    
     if (m_sprite) {
         m_sprite->draw(m_x, m_y);
     }
-    ofSetColor(ofColor::white); // Reset color
+
+    ofPopMatrix(); // restore transform
+    ofPopStyle();  
 
 }
 
@@ -345,13 +375,54 @@ void AquariumGameScene::Update(){
         }
         this->m_aquarium->update();
     }
+    if (!powerUpActive && ofRandom(0, 1000) < 2) { // small chance to spawn
+    powerUpX = ofRandom(50, ofGetWidth() - 50);
+    powerUpY = ofRandom(50, ofGetHeight() - 50);
+    powerUpBaseY = powerUpY;
+    powerUpActive = true;
+}
 
+// Check if player collects the power-up
+if (powerUpActive) {
+    float dx = powerUpX - m_player->getX();
+    float dy = powerUpY - m_player->getY();
+    float distance = sqrt(dx * dx + dy * dy);
+    float collisionBuffer = 25.0f;
+
+    if (distance <= powerUpRadius + m_player->getCollisionRadius() + collisionBuffer) {
+        powerUpActive = false;
+        m_player->setPowered(true);  // turns effect
+        powerUpStartTime = ofGetElapsedTimef();
+
+        basePlayerSpeed = m_player->getSpeed();
+        m_player->changeSpeed(basePlayerSpeed * 2.0); // gives speed
+    }
+}
+
+// duration of power up
+if (m_player->isPowered()) {
+    float elapsed = ofGetElapsedTimef() - powerUpStartTime;
+    
+    if (elapsed > powerUpDuration) {
+     
+        // resets when power up is done
+        m_player->setPowered(false);            
+        m_player->changeSpeed(basePlayerSpeed); 
+    }
+ }
 }
 
 void AquariumGameScene::Draw() {
     this->m_player->draw();
     this->m_aquarium->draw();
-    this->paintAquariumHUD();
+     // shows power up to collect
+    if (powerUpActive) {
+        float bobOffset = sin(ofGetElapsedTimef() * 2.0f) * 5.0f;
+        ofSetColor(255, 255, 0, 200); 
+        ofDrawCircle(powerUpX, powerUpBaseY + bobOffset, powerUpRadius);
+        ofSetColor(255);
+    }
+     this->paintAquariumHUD();
 
 }
 

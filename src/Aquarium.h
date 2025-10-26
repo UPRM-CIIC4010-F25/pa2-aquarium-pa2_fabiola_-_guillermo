@@ -54,6 +54,8 @@ public:
     void changeSpeed(int speed);
     void setLives(int lives) { m_lives = lives; }
     void setDirection(float dx, float dy);
+    void setPowered(bool powered) {m_powered = powered;}
+    bool isPowered() const { return m_powered; }
     float isXDirectionActive() { return m_dx != 0; }
     float isYDirectionActive() {return m_dy != 0; }
     float getDx() { return m_dx; }
@@ -73,6 +75,8 @@ private:
     int m_lives = 3;
     int m_power = 1; // mark current power lvl
     int m_damage_debounce = 0; // frames to wait after eating
+
+    bool m_powered = false; //
 };
 
 class NPCreature : public Creature {
@@ -162,6 +166,17 @@ class AquariumGameScene : public GameScene {
         std::shared_ptr<GameEvent> m_lastEvent;
         string m_name;
         AwaitFrames updateControl{5};
+    // power up system
+        bool powerUpActive = false;
+        float powerUpX = 0;
+        float powerUpY = 0;
+        float powerUpBaseY;
+        float powerUpRadius = 10;
+
+        bool playerPowered = false;
+        float powerUpStartTime = 0;
+        float powerUpDuration = 10.0f; // duration time
+        float basePlayerSpeed = 0;
 };
 
 
