@@ -1,5 +1,6 @@
 #include "Aquarium.h"
 #include <cstdlib>
+#include <cmath>
 
 
 string AquariumCreatureTypeToString(AquariumCreatureType t){
@@ -8,6 +9,10 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
             return "BiggerFish";
         case AquariumCreatureType::NPCreature:
             return "BaseFish";
+        case AquariumCreatureType::SwordFish:
+            return "SwordFish";
+        case AquariumCreatureType::Eel:
+            return "Eel";
         default:
             return "UknownFish";
     }
@@ -161,20 +166,83 @@ void BiggerFish::draw() const {
     this->m_sprite->draw(this->m_x, this->m_y);
 }
 
+class SwordFish : public NPCreature{
+public:
+    SwordFish(float x,float y,int speed,std::shared_ptr<GameSprite> sprite)
+    : NPCreature(x,y,speed,sprite){
+        setCollisionRadius(25);
+        m_value = 4;
+        m_creatureType = AquariumCreatureType::SwordFish;
+        m_dx = 1.0f; m_dy = 0.0f; normalize();
+    }
+    void move() override {
+        if (m_dashing) {
+            if (m_timer % 8 == 0) {
+                m_dx = (rand()%2 ? 1.f : -1.f);
+                m_dy = (rand()%3 - 1) * 0.4f;
+                normalize();
+            }
+            m_x += m_dx * (m_speed * 1.5f);
+            m_y += m_dy * (m_speed * 1.5f);
+            if (++m_timer >= 28) { m_timer = 0; m_dashing = false; }
+        } else {
+            if (m_timer == 0) { m_dx = 0.25f; m_dy = 0.0f; }
+            m_x += m_dx * (m_speed * 0.5f);
+            m_y += m_dy * (m_speed * 0.5f);
+            if (++m_timer >= 14) { m_timer = 0; m_dashing = true; }
+        }
+        if (m_sprite) m_sprite->setFlipped(m_dx < 0);
+        bounce();
+    }
+private:
+    int  m_timer   = 0;
+    bool m_dashing = true;
+};
+class Eel : public NPCreature {
+public:
+    Eel(float x,float y,int speed,std::shared_ptr<GameSprite> sprite)
+    : NPCreature(x,y,speed,sprite){
+        setCollisionRadius(26);
+        m_value = 3;
+        m_creatureType = AquariumCreatureType::Eel;
+        m_dx = 0.8f; m_dy = 0.0f; normalize();
+    }
+    void move() override {
+        m_t += 0.04f;
+        float wave = sinf(m_t) * 0.9f;
+        m_dx = (m_dx >= 0 ? 1.0f : -1.0f);
+        m_dy = wave;
+        normalize();
+        m_x += m_dx * (m_speed * 1.1f);
+        m_y += m_dy * (m_speed * 1.1f);
+        if (m_sprite) m_sprite->setFlipped(m_dx < 0);
+        bounce();
+    }
+private:
+    float m_t = 0.f;
+};
+
 
 // AquariumSpriteManager
 AquariumSpriteManager::AquariumSpriteManager(){
     this->m_npc_fish = std::make_shared<GameSprite>("base-fish.png", 70,70);
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
+    this->m_swordfish = std::make_shared<GameSprite>("swordfish.png", 140, 60);
+    this->m_eel = std::make_shared<GameSprite>("eel.png", 120, 40);
+
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
     switch(t){
         case AquariumCreatureType::BiggerFish:
-            return std::make_shared<GameSprite>(*this->m_big_fish);
-            
+            return std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
         case AquariumCreatureType::NPCreature:
-            return std::make_shared<GameSprite>(*this->m_npc_fish);
+            return std::make_shared<GameSprite>("base-fish.png", 70, 70);
+        case AquariumCreatureType::SwordFish:
+            return std::make_shared<GameSprite>("swordfish.png", 140, 60);
+
+        case AquariumCreatureType::Eel:
+            return std::make_shared<GameSprite>("eel.png", 120, 40);
         default:
             return nullptr;
     }
@@ -264,6 +332,13 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
     if (type == AquariumCreatureType::BiggerFish) {
         radius = 60.0f;   //big fish
     }
+    if (type == AquariumCreatureType::SwordFish) {
+        radius = 28.0f; 
+    }
+
+    if (type == AquariumCreatureType::Eel){
+        radius = 28.0f;
+    }
 
     // Keep the spawn point inside the glass
     if (x < (int)radius) x = (int)radius;
@@ -280,7 +355,13 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
         case AquariumCreatureType::BiggerFish:
             this->addCreature(std::make_shared<BiggerFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::BiggerFish)));
             break;
-        default:
+        case AquariumCreatureType::SwordFish:
+            this->addCreature(std::make_shared<SwordFish>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::SwordFish)));
+            break;
+        case AquariumCreatureType::Eel:
+            this->addCreature(std::make_shared<Eel>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::Eel)));
+            break;
+            default:
             ofLogError() << "Unknown creature type to spawn!";
             break;
     }
