@@ -35,6 +35,8 @@ void ofApp::setup(){
     myAquarium->addAquariumLevel(std::make_shared<Level_0>(0, 10));
     myAquarium->addAquariumLevel(std::make_shared<Level_1>(1, 15));
     myAquarium->addAquariumLevel(std::make_shared<Level_2>(2, 20));
+    myAquarium->addAquariumLevel(std::make_shared<Level_3>(2, 35));//adding level 3
+    myAquarium->addAquariumLevel(std::make_shared<Level_4>(2, 50));//adding level 4
     myAquarium->Repopulate(); // initial population
 
     // now that we are mostly set, lets pass the player and the aquarium downstream
