@@ -39,6 +39,9 @@ class AquariumLevel : public GameLevel {
         void levelReset(){m_level_score=0;this->populationReset();}
         virtual std::vector<AquariumCreatureType> Repopulate() = 0;
     protected:
+        
+        std::vector<AquariumCreatureType> BuildRepopulateList();
+        
         std::vector<std::shared_ptr<AquariumLevelPopulationNode>> m_levelPopulation;
         int m_level_score;
         int m_targetScore;
