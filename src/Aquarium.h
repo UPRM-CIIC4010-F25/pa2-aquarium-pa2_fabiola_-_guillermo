@@ -108,11 +108,15 @@ class AquariumSpriteManager {
         AquariumSpriteManager();
         ~AquariumSpriteManager() = default;
         std::shared_ptr<GameSprite>GetSprite(AquariumCreatureType t);
+        std::shared_ptr<GameSprite>GetPlayerSprite()const {
+            return m_player_fish;
+        }
     private:
         std::shared_ptr<GameSprite> m_npc_fish;
         std::shared_ptr<GameSprite> m_big_fish;
         std::shared_ptr<GameSprite> m_swordfish;
-        std::shared_ptr<GameSprite> m_eel; 
+        std::shared_ptr<GameSprite> m_eel;
+        std::shared_ptr<GameSprite> m_player_fish; 
 };
 
 
@@ -158,7 +162,16 @@ std::shared_ptr<GameEvent> DetectAquariumCollisions(std::shared_ptr<Aquarium> aq
 class AquariumGameScene : public GameScene {
     public:
         AquariumGameScene(std::shared_ptr<PlayerCreature> player, std::shared_ptr<Aquarium> aquarium, string name)
-        : m_player(std::move(player)) , m_aquarium(std::move(aquarium)), m_name(name){}
+        : m_player(std::move(player)) , m_aquarium(std::move(aquarium)), m_name(name){
+            //loading eating sound
+            eatSound.load("eatingsound.mp3");
+            eatSound.setVolume(0.7f);
+            eatSound.setMultiPlay(true); //plays quickly
+            //loading hurt sound
+            hurtSound.load("hurtsound.mp3");
+            hurtSound.setVolume(0.7f);
+            hurtSound.setMultiPlay(true);
+        }
         std::shared_ptr<GameEvent> GetLastEvent(){return m_lastEvent;}
         void SetLastEvent(std::shared_ptr<GameEvent> event){this->m_lastEvent = event;}
         std::shared_ptr<PlayerCreature> GetPlayer(){return this->m_player;}
@@ -173,6 +186,36 @@ class AquariumGameScene : public GameScene {
         std::shared_ptr<GameEvent> m_lastEvent;
         string m_name;
         AwaitFrames updateControl{5};
+        //eating sound
+        ofSoundPlayer eatSound;
+        //damage sound
+        ofSoundPlayer hurtSound;
+
+    //adding bubbles
+        struct Bubble {
+        float x, y, speed;
+    };
+    std::vector<Bubble> bubbles;
+
+    void spawnBubble() {
+        if (ofRandom(0, 100) < 5) { 
+            bubbles.push_back({ ofRandomWidth(), ofGetHeight(), ofRandom(1, 3) });
+        }
+    }
+
+    void drawBubbles() {
+        ofSetColor(200, 200, 255, 150); 
+        for (auto& b : bubbles) {
+            ofDrawCircle(b.x, b.y, 3);
+            b.y -= b.speed; 
+        }
+        // Remove bubbles 
+        bubbles.erase(
+            std::remove_if(bubbles.begin(), bubbles.end(),
+                [](Bubble& b){ return b.y < 0; }),
+            bubbles.end()
+        );
+    }
     // power up system
         bool powerUpActive = false;
         float powerUpX = 0;

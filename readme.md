@@ -24,7 +24,7 @@ Grading
 ## Team Info
 | Student Number | Student Name | Student Email |
 |-|-|-|
-|(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
+|(843-22-5451)| (Fabiola M. Santiago Colon)| (fabiola.santiago12@upr.edu) |
 |(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
 
 ---
@@ -37,3 +37,11 @@ If a partner has no commits in the repositories, they will receive a 0.
 
 # Student Notes
 If you have any bonus specs, bonus or any details the TA's should know, you should include it here:
+
+Bonus features:
+Nemo-themed sprites for the player and NPC fish
+Animated bubbles rising in the background
+Sound effects for eating and taking damage
+Custom ocean background
+Player tag above the player fish
+Visual polish and small gameplay tweaks

@@ -5,7 +5,7 @@ void ofApp::setup(){
 
     ofSetFrameRate(60);
     ofSetBackgroundColor(ofColor::blue);
-    backgroundImage.load("background.png");
+    backgroundImage.load("background2.png"); //new background
     backgroundImage.resize(ofGetWindowWidth(), ofGetWindowHeight());
 
 
@@ -27,7 +27,7 @@ void ofApp::setup(){
 
     // Lets setup the aquarium
     myAquarium = std::make_shared<Aquarium>(ofGetWindowWidth(), ofGetWindowHeight(), spriteManager);
-    player = std::make_shared<PlayerCreature>(ofGetWindowWidth()/2 - 50, ofGetWindowHeight()/2 - 50, DEFAULT_SPEED, this->spriteManager->GetSprite(AquariumCreatureType::NPCreature));
+    player = std::make_shared<PlayerCreature>(ofGetWindowWidth()/2 - 50, ofGetWindowHeight()/2 - 50, DEFAULT_SPEED, spriteManager-> GetPlayerSprite());
     player->setDirection(0, 0); // Initially stationary
     player->setBounds(ofGetWindowWidth() - 20, ofGetWindowHeight() - 20);
 

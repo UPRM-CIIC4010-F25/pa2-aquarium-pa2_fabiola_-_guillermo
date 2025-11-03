@@ -83,6 +83,11 @@ void PlayerCreature::draw() const {
     
     if (m_sprite) {
         m_sprite->draw(m_x, m_y);
+
+        //tag to notice player
+        ofSetColor(ofColor::white);
+        string tag = "PLAYER";
+        ofDrawBitmapString(tag, m_x + 5, m_y - 10);
     }
 
     ofPopMatrix(); // restore transform
@@ -225,19 +230,20 @@ private:
 
 // AquariumSpriteManager
 AquariumSpriteManager::AquariumSpriteManager(){
-    this->m_npc_fish = std::make_shared<GameSprite>("base-fish.png", 70,70);
-    this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
+    this->m_npc_fish = std::make_shared<GameSprite>("bluetang.png", 70,70);
+    this->m_big_fish = std::make_shared<GameSprite>("Moorish.png", 120, 120);
     this->m_swordfish = std::make_shared<GameSprite>("swordfish.png", 140, 60);
     this->m_eel = std::make_shared<GameSprite>("eel.png", 120, 40);
+    this->m_player_fish = std::make_shared<GameSprite>("clownfish.png", 70,70);
 
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
     switch(t){
         case AquariumCreatureType::BiggerFish:
-            return std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
+            return std::make_shared<GameSprite>("Moorish.png", 120, 120);
         case AquariumCreatureType::NPCreature:
-            return std::make_shared<GameSprite>("base-fish.png", 70, 70);
+            return std::make_shared<GameSprite>("bluetang.png", 70, 70);
         case AquariumCreatureType::SwordFish:
             return std::make_shared<GameSprite>("swordfish.png", 140, 60);
 
@@ -420,6 +426,8 @@ std::shared_ptr<GameEvent> DetectAquariumCollisions(std::shared_ptr<Aquarium> aq
 //  Imlementation of the AquariumScene
 
 void AquariumGameScene::Update(){
+    //bubbles 
+    spawnBubble();
     std::shared_ptr<GameEvent> event;
 
     this->m_player->update();
@@ -432,6 +440,7 @@ void AquariumGameScene::Update(){
                 event->print();
                 if(this->m_player->getPower() < event->creatureB->getValue()){
                     ofLogNotice() << "Player is too weak to eat the creature!" << std::endl;
+                    hurtSound.play();
                     this->m_player->loseLife(3*60); // 3 frames debounce, 3 seconds at 60fps
                     if(this->m_player->getLives() <= 0){
                         this->m_lastEvent = std::make_shared<GameEvent>(GameEventType::GAME_OVER, this->m_player, nullptr);
@@ -441,6 +450,10 @@ void AquariumGameScene::Update(){
                 else{
                     this->m_aquarium->removeCreature(event->creatureB);
                     this->m_player->addToScore(1, event->creatureB->getValue());
+                    
+                    //eating sound
+                    eatSound.play();
+
                     if (this->m_player->getScore() % 25 == 0){
                         this->m_player->increasePower(1);
                         ofLogNotice() << "Player power increased to " << this->m_player->getPower() << "!" << std::endl;
@@ -496,6 +509,9 @@ if (m_player->isPowered()) {
 void AquariumGameScene::Draw() {
     this->m_player->draw();
     this->m_aquarium->draw();
+
+    //drawing bubbles
+    drawBubbles();
      // shows power up to collect
     if (powerUpActive) {
         float bobOffset = sin(ofGetElapsedTimef() * 2.0f) * 5.0f;
