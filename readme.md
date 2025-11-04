@@ -25,7 +25,7 @@ Grading
 | Student Number | Student Name | Student Email |
 |-|-|-|
 |(843-22-5451)| (Fabiola M. Santiago Colon)| (fabiola.santiago12@upr.edu) |
-|(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
+|(843-22-8469)| (Guillermo J. Cruz Figueroa)| (guillermo.cruz5@upr.edu) |
 
 ---
 
